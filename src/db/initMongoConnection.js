@@ -1,5 +1,3 @@
-
-
 import mongoose from 'mongoose';
 
 import { getEnvVar } from '../utils/getEnvVar.js';
@@ -12,7 +10,7 @@ export const initMongoConnection = async () => {
     const db = getEnvVar('MONGODB_DB');
 
     await mongoose.connect(
-      `mongodb+srv://denisderus:iKCQTEU3mJOT0GNu@contact.3tcbfkx.mongodb.net/contacts?retryWrites=true&w=majority&appName=Contact`,
+      `mongodb+srv://${user}:${pwd}@c${url}/${db}?retryWrites=true&w=majority&appName=Contact`,
     );
     console.log('Mongo connection successfully established!');
   } catch (e) {
