@@ -1,15 +1,22 @@
+
+
 import mongoose from 'mongoose';
 
-const { MONGODB_USER, MONGODB_PASSWORD, MONGODB_URL, MONGODB_DB } = process.env;
+import { getEnvVar } from '../utils/getEnvVar.js';
 
-const uri = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@c${MONGODB_URL}/?retryWrites=true&w=majority&appName=${MONGODB_DB}`;
+export const initMongoConnection = async () => {
+  try {
+    const user = getEnvVar('MONGODB_USER');
+    const pwd = getEnvVar('MONGODB_PASSWORD');
+    const url = getEnvVar('MONGODB_URL');
+    const db = getEnvVar('MONGODB_DB');
 
-const clientOptions = {
-  serverApi: { version: '1', strict: true, deprecationErrors: true },
+    await mongoose.connect(
+      `mongodb+srv://denisderus:iKCQTEU3mJOT0GNu@contact.3tcbfkx.mongodb.net/contacts?retryWrites=true&w=majority&appName=Contact`,
+    );
+    console.log('Mongo connection successfully established!');
+  } catch (e) {
+    console.log('Error while setting up mongo connection', e);
+    throw e;
+  }
 };
-
-export default async function initMongoConnection() {
-  await mongoose.connect(uri, clientOptions);
-  await mongoose.connection.db.admin().command({ ping: 1 });
-  console.log('Mongo connection successfully established!');
-}
