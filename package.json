@@ -9,15 +9,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Vitaliy-Z/nodejs-hw-mongodb.git"
+    "url": "git+https://github.com/DertseK/nodejs-hw-mongodb.git"
   },
-  "author": "Vitaliy-Zvieriev",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Vitaliy-Z/nodejs-hw-mongodb/issues"
-  },
-  "homepage": "https://github.com/Vitaliy-Z/nodejs-hw-mongodb#readme",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
