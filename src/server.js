@@ -1,17 +1,15 @@
-
 import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
 import { getEnvVar } from './utils/getEnvVar.js';
-import * as contactsServices from './services/contacts.js';
+import { getAllContacts, getContactById } from './services/contacts.js';
 
-export const setupServer = () => {
+const PORT = Number(getEnvVar('PORT', '3000'));
+
+export const setupServer = async () => {
   const app = express();
-  const PORT = Number(getEnvVar('PORT', 3000));
-
   app.use(express.json());
-    app.use(cors());
-
+  app.use(cors());
   app.use(
     pino({
       transport: {
@@ -19,57 +17,56 @@ export const setupServer = () => {
       },
     }),
   );
+  app.get('/', (req, res) => {
+    res.json({ message: 'Working' });
+  });
 
-  app.get('/contacts', async (req, res, next) => {
+  app.get('/contacts', async (req, res) => {
     try {
-      const data = await contactsServices.getAllContacts();
-      res.json({
+      const contacts = await getAllContacts();
+      res.status(200).json({
         status: 200,
         message: 'Successfully found contacts!',
-        data,
+        data: contacts,
       });
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      console.error(error);
     }
   });
 
   app.get('/contacts/:contactId', async (req, res, next) => {
     try {
       const { contactId } = req.params;
-      const data = await contactsServices.getContactById(contactId);
+      const contact = await getContactById(contactId);
 
-      if (!data) {
-        return res.status(404).json({
+      if (!contact) {
+        res.status(404).json({
           message: 'Contact not found',
         });
+        return;
       }
 
-      res.json({
+      res.status(200).json({
         status: 200,
-        message: `Successfully found contact with id ${contactId} !`,
-        data,
+        message: `Successfully found contact with id ${contactId}!`,
+        data: contact,
       });
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      console.error(error);
     }
   });
-
-  // ❗️ 404 для невідомих маршрутів
-  app.use((req, res) => {
+  app.use((req, res, next) => {
     res.status(404).json({
       message: 'Not found',
     });
   });
 
-  // ❗️ Глобальний обробник помилок
   app.use((err, req, res, next) => {
-    console.error(err.stack);
     res.status(500).json({
       message: 'Something went wrong',
       error: err.message,
     });
   });
-
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
