@@ -1,7 +1,4 @@
- // src/db/models/student.js 
-
 import { model, Schema } from 'mongoose';
-
 const contactsSchema = new Schema(
   {
     name: {
@@ -14,12 +11,9 @@ const contactsSchema = new Schema(
     },
     email: {
       type: String,
-      required: false,
-      
     },
     isFavourite: {
       type: Boolean,
-      required: false,
       default: false,
     },
     contactType: {
@@ -27,11 +21,10 @@ const contactsSchema = new Schema(
       enum: ['work', 'home', 'personal'],
       required: true,
       default: 'personal',
-    }
+    },
   },
   {
     timestamps: true,
-    versionKey: false,
   },
 );
-export const ContactsCollection = model('contact', contactsSchema);
+export const ContactsCollection = model('Contact', contactsSchema);
