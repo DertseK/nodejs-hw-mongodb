@@ -2,24 +2,23 @@ import { ContactsCollection } from '../db/models/Contacts.js';
 import { calculatePaginationData } from '../utils/calculatePaginationData.js';
 import { SORT_ORDER } from '../constants/index.js';
 
-export const getContactById = (contactId) =>
-  ContactsCollection.findById(contactId);
+// export const getAllContacts = () => ContactsCollection.find();
+
+export const getContactById = (contactId, userId) =>
+  ContactsCollection.findOne({_id: contactId, userId: userId});
 
 export const createContact = async (payload) => {
   const contact = await ContactsCollection.create(payload);
   return contact;
 };
 
-export const deleteContact = async (contactId) => {
-  const contact = await ContactsCollection.findOneAndDelete({
-    _id: contactId,
-  });
-  return contact;
+export const deleteContact = async (contactId, userId) => {
+  return ContactsCollection.findOneAndDelete({_id: contactId, userId: userId});
 };
 
-export const updateContact = async (contactId, payload, options = {}) => {
-  const rawResult = await ContactsCollection.findByIdAndUpdate(
-    { _id: contactId },
+export const updateContact = async (contactId, userId, payload, options = {}) => {
+  const rawResult = await ContactsCollection.findOneAndUpdate(
+    { _id: contactId, userId: userId },
     payload,
     {
       new: true,
@@ -42,29 +41,15 @@ export const getAllContacts = async ({
   sortOrder = SORT_ORDER.ASC,
   sortBy = '_id',
   filter = {},
+  userId,
 }) => {
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
-  const contactsQuery = ContactsCollection.find();
-  if (filter.gender) {
-    contactsQuery.where('gender').equals(filter.gender);
-  }
-  if (filter.maxAge) {
-    contactsQuery.where('age').lte(filter.maxAge);
-  }
-  if (filter.minAge) {
-    contactsQuery.where('age').gte(filter.minAge);
-  }
-  if (filter.maxAvgMark) {
-    contactsQuery.where('avgMark').lte(filter.maxAvgMark);
-  }
-  if (filter.minAvgMark) {
-    contactsQuery.where('avgMark').gte(filter.minAvgMark);
-  }
-
-  const [contactsCount, contacts] = await Promise.all([
-    ContactsCollection.find().merge(contactsQuery).countDocuments(),
+  const contactsQuery = ContactsCollection.find({ userId });
+ 
+const [contactsCount, contacts] = await Promise.all([
+    ContactsCollection.find({ userId }).merge(contactsQuery).countDocuments(),
     contactsQuery
       .skip(skip)
       .limit(limit)
@@ -74,7 +59,6 @@ export const getAllContacts = async ({
   const paginationData = calculatePaginationData(contactsCount, perPage, page);
 
   return {
-    data: contacts,
-    ...paginationData,
+    data: contacts, ...paginationData,
   };
 };

@@ -1,3 +1,5 @@
+ // src/db/models/contacts.js 
+
 import { model, Schema } from 'mongoose';
 
 const contactsSchema = new Schema(
@@ -13,6 +15,7 @@ const contactsSchema = new Schema(
     email: {
       type: String,
       required: false,
+      
     },
     isFavourite: {
       type: Boolean,
@@ -25,6 +28,11 @@ const contactsSchema = new Schema(
       required: true,
       default: 'personal',
     },
+    userId: { // нова властивість 
+      type: Schema.Types.ObjectId, 
+      ref: 'user',
+      required: true,
+    },  
   },
   {
     timestamps: true,
