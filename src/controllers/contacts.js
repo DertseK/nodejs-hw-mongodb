@@ -6,6 +6,9 @@ import { updateContact } from '../services/contacts.js';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
 
 export const getContactByIdController = async (req, res) => {
   const { contactId } = req.params;
@@ -23,15 +26,36 @@ export const getContactByIdController = async (req, res) => {
   });
 };
 
-export const createContactController = async (req, res) => {
-  const userId = req.user._id.toString();
-  const contact = await createContact({ ...req.body, userId });
+export const createContactController = async (req, res, next) => {
+  try {
+    const userId = req.user._id.toString();
+    const photo = req.file;
+    let photoUrl;
 
-  res.status(201).json({
-    status: 201,
-    message: 'Successfully created a contact!',
-    data: contact,
-  });
+    if (photo) {
+      if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+        photoUrl = await saveFileToCloudinary(photo);
+      } else {
+        photoUrl = await saveFileToUploadDir(photo);
+      }
+    }
+
+    const contactData = {
+      ...req.body,
+      userId,
+      ...(photoUrl && { photo: photoUrl }),
+    };
+
+    const contact = await createContact(contactData);
+
+    res.status(201).json({
+      status: 201,
+      message: 'Successfully created a contact!',
+      data: contact,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const deleteContactController = async (req, res, next) => {
@@ -69,6 +93,18 @@ export const upsertContactController = async (req, res, next) => {
 
 export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  const photo = req.file;
+  let photoUrl;
+
+  if (photo) {
+    if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+    req.body.photo = photoUrl;
+  }
+
   const userId = req.user._id.toString();
   const result = await updateContact(contactId, userId, req.body);
 

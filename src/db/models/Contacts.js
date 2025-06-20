@@ -1,5 +1,3 @@
- // src/db/models/contacts.js 
-
 import { model, Schema } from 'mongoose';
 
 const contactsSchema = new Schema(
@@ -32,7 +30,8 @@ const contactsSchema = new Schema(
       type: Schema.Types.ObjectId, 
       ref: 'user',
       required: true,
-    },  
+    }, 
+    photo: {type: String},
   },
   {
     timestamps: true,
