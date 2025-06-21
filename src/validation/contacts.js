@@ -1,5 +1,3 @@
-// src/validation/contacts.js
-
 import Joi from 'joi';
 import { isValidObjectId } from 'mongoose';
 

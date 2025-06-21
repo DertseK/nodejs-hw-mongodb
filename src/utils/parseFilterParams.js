@@ -1,5 +1,3 @@
-// src/utils/parseFilterParams.js
-
 const parseGender = (gender) => {
   const isString = typeof gender === 'string';
   if (!isString) return;
