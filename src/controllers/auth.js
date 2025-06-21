@@ -1,3 +1,5 @@
+// src/controllers/auth.js
+
 import { registerUser } from '../services/auth.js';
 import { loginUser } from '../services/auth.js';
 import { ONE_DAY } from '../constants/index.js';
